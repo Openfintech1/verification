@@ -1,64 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pottan Aashi Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UPI VPA Verification</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="flex items-center justify-center h-screen bg-blue-100">
-  <div class="bg-white rounded-lg w-96 p-6 shadow-lg">
-    <h1 class="text-lg font-bold mb-2">
-      Let's get your, <span class="font-normal">VPA validated</span>
-    </h1>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">UPI VPA Verification</h1>
 
-    <form class="mt-5">
-      <div class="mb-4">
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-          VPA ID <span class="text-red-500">*</span>
-        </label>
-        <input type="text" id="name" placeholder="Enter your VPA Id" autocomplete="off"
-          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
+    <div class="mb-4">
+      <label class="block text-gray-700 mb-2" for="vpa">Enter VPA:</label>
+      <input class="w-full p-2 border border-gray-300 rounded" type="text" id="vpa" placeholder="example@upi">
+    </div>
 
-      <div class="mb-4">
-        <label for="merchant_reference_id" class="block text-sm font-medium text-gray-700 mb-1">
-          Merchant Reference ID <span class="text-red-500">*</span>
-        </label>
-        <input type="text" id="merchant_reference_id" placeholder="Enter your Merchant Reference ID"
-          pattern="[A-Za-z0-9]{7,40}"
-          title="Only alphabets and numbers are allowed. Minimum: 7 characters. Maximum: 40 characters." required
-          autocomplete="off"
-          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
+    <div class="mb-4">
+      <label class="block text-gray-700 mb-2" for="merchant_reference_id">Merchant Reference ID:</label>
+      <input class="w-full p-2 border border-gray-300 rounded" type="text" id="merchant_reference_id" placeholder="Your Reference ID">
+    </div>
 
-      <div class="bg-blue-50 border-l-4 border-blue-500 p-3 text-sm text-blue-700 rounded-md mb-4">
-        <span class="inline-block mr-2">✔️</span>This is standard practice and is 100% secure.
-      </div>
+    <button class="bg-blue-500 text-white px-4 py-2 rounded w-full" onclick="verifyVPA()">Verify VPA</button>
 
-      <button type="button"
-        class="w-full py-2 text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        Check
-      </button>
-    </form>
-
-    <p class="text-xs text-gray-600 mt-4">
-      By proceeding, you give us consent to verify your UPI Validation.
-      <a href="#" class="text-blue-500 hover:underline">Show details.</a>
-    </p>
+    <div id="result" class="mt-4 text-center text-gray-700"></div>
   </div>
 
   <script>
-    const button = document.querySelector('button');
+    async function verifyVPA() {
+      const vpa = document.getElementById('vpa').value.trim();
+      const merchant_reference_id = document.getElementById('merchant_reference_id').value.trim();
 
-    button.addEventListener('click', async () => {
-      const vpa = document.getElementById('name').value.trim();
-      const merchantReferenceId = document.getElementById('merchant_reference_id').value.trim();
-
-      if (!vpa || !merchantReferenceId) {
-        alert('Please fill all required fields!');
+      if (!vpa || !merchant_reference_id) {
+        alert("Please enter both VPA and Merchant Reference ID");
         return;
       }
 
@@ -70,24 +44,20 @@
           },
           body: JSON.stringify({
             vpa: vpa,
-            merchant_reference_id: merchantReferenceId
+            merchant_reference_id: merchant_reference_id
           })
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
-        if (response.ok) {
-          alert("VPA Verification Success: " + JSON.stringify(result));
-        } else {
-          alert("VPA Verification Failed: " + JSON.stringify(result));
-        }
+        document.getElementById('result').innerText = 'VPA Verification Success: ' + JSON.stringify(data);
+
       } catch (error) {
         console.error('Error:', error);
-        alert('Something went wrong. Please try again later.');
+        document.getElementById('result').innerText = 'Error verifying VPA';
       }
-    });
+    }
   </script>
 
 </body>
-
 </html>
