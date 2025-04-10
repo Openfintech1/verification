@@ -1,40 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPA Verification</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI VPA Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h1 class="text-2xl font-bold mb-4 text-center">UPI VPA Verification</h1>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <input id="vpa" type="text" placeholder="Enter VPA" class="w-full mb-4 p-2 border rounded">
-    <input id="merchantRef" type="text" placeholder="Merchant Ref ID" class="w-full mb-4 p-2 border rounded">
+    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">UPI VPA Verification</h2>
 
-    <button onclick="verifyVPA()" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-      Verify VPA
-    </button>
+        <div class="mb-4">
+            <label for="vpa" class="block mb-2 font-medium">Enter UPI VPA:</label>
+            <input type="text" id="vpa" class="w-full p-3 border rounded-md" placeholder="example@okaxis">
+        </div>
 
-    <div id="result" class="mt-4 text-center text-sm text-gray-700"></div>
-  </div>
+        <div class="mb-4">
+            <label for="merchant_id" class="block mb-2 font-medium">Merchant Reference ID:</label>
+            <input type="text" id="merchant_id" class="w-full p-3 border rounded-md" placeholder="Enter Merchant ID">
+        </div>
 
-  <script>
-    async function verifyVPA() {
-      const vpa = document.getElementById('vpa').value;
-      const merchantRef = document.getElementById('merchantRef').value;
+        <button onclick="verifyVPA()" class="bg-blue-600 text-white px-4 py-2 rounded-md w-full hover:bg-blue-700">
+            Verify Now
+        </button>
 
-      const response = await fetch('https://j72y1nb3vc.execute-api.ap-south-1.amazonaws.com/verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vpa: vpa, merchant_reference_id: merchantRef })
-      });
+        <div id="result" class="mt-6 text-center text-lg font-semibold"></div>
+    </div>
 
-      const result = await response.text();  // Lambda returns text
-      document.getElementById('result').innerText = "VPA Verification Success: " + result;
-    }
-  </script>
+    <script>
+        async function verifyVPA() {
+            const vpaValue = document.getElementById('vpa').value.trim();
+            const merchantIdValue = document.getElementById('merchant_id').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            if (!vpaValue || !merchantIdValue) {
+                resultDiv.innerHTML = `<span class="text-red-500">Please fill both fields.</span>`;
+                return;
+            }
+
+            resultDiv.innerHTML = `Checking...`;
+
+            try {
+                const response = await fetch('https://j72y1nb3vc.execute-api.ap-south-1.amazonaws.com/verification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        vpa: vpaValue,
+                        merchant_reference_id: merchantIdValue
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 200) {
+                    resultDiv.innerHTML = `<span class="text-green-600">Success: ${data.status}</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="text-red-500">Error: ${data.error || 'Something went wrong'}</span>`;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="text-red-500">Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+
 </body>
+
 </html>
