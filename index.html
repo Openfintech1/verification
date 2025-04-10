@@ -2,62 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UPI VPA Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VPA Verification</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
     <h1 class="text-2xl font-bold mb-4 text-center">UPI VPA Verification</h1>
 
-    <div class="mb-4">
-      <label class="block text-gray-700 mb-2" for="vpa">Enter VPA:</label>
-      <input class="w-full p-2 border border-gray-300 rounded" type="text" id="vpa" placeholder="example@upi">
-    </div>
+    <input id="vpa" type="text" placeholder="Enter VPA" class="w-full mb-4 p-2 border rounded">
+    <input id="merchantRef" type="text" placeholder="Merchant Ref ID" class="w-full mb-4 p-2 border rounded">
 
-    <div class="mb-4">
-      <label class="block text-gray-700 mb-2" for="merchant_reference_id">Merchant Reference ID:</label>
-      <input class="w-full p-2 border border-gray-300 rounded" type="text" id="merchant_reference_id" placeholder="Your Reference ID">
-    </div>
+    <button onclick="verifyVPA()" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+      Verify VPA
+    </button>
 
-    <button class="bg-blue-500 text-white px-4 py-2 rounded w-full" onclick="verifyVPA()">Verify VPA</button>
-
-    <div id="result" class="mt-4 text-center text-gray-700"></div>
+    <div id="result" class="mt-4 text-center text-sm text-gray-700"></div>
   </div>
 
   <script>
     async function verifyVPA() {
-      const vpa = document.getElementById('vpa').value.trim();
-      const merchant_reference_id = document.getElementById('merchant_reference_id').value.trim();
+      const vpa = document.getElementById('vpa').value;
+      const merchantRef = document.getElementById('merchantRef').value;
 
-      if (!vpa || !merchant_reference_id) {
-        alert("Please enter both VPA and Merchant Reference ID");
-        return;
-      }
+      const response = await fetch('https://YOUR_API_GATEWAY_URL/verify-vpa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vpa: vpa, merchant_reference_id: merchantRef })
+      });
 
-      try {
-        const response = await fetch('https://j72y1nb3vc.execute-api.ap-south-1.amazonaws.com/verification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            vpa: vpa,
-            merchant_reference_id: merchant_reference_id
-          })
-        });
-
-        const data = await response.json();
-
-        document.getElementById('result').innerText = 'VPA Verification Success: ' + JSON.stringify(data);
-
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('result').innerText = 'Error verifying VPA';
-      }
+      const result = await response.text();  // Lambda returns text
+      document.getElementById('result').innerText = "VPA Verification Success: " + result;
     }
   </script>
-
 </body>
 </html>
