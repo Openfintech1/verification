@@ -33,7 +33,7 @@
           const vpa = document.getElementById('name').value;
           const merchantReferenceId = document.getElementById('merchant_reference_id').value;
       
-          const response = await fetch('aws:execute-api:ap-south-1:029287558335:j72y1nb3vc/*/POST/', {
+          const response = await fetch('https://j72y1nb3vc.execute-api.ap-south-1.amazonaws.com/verification', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
