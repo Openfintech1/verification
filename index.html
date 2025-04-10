@@ -49,21 +49,18 @@
             resultBox.innerHTML = "Verifying...";
 
             try {
-                const response = await fetch("https://j72y1nb3vc.execute-api.ap-south-1.amazonaws.com/verification", { // <-- Replace with your API Gateway URL
+                const response = await fetch("https://j72y1nb3vc.execute-api.ap-south-1.amazonaws.com/verification", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-    vpa: vpa,
-    merchantReferenceId: merchantReferenceId
-})
-
+                        vpa: vpa,
+                        merchant_reference_id: merchantReferenceId
                     })
                 });
 
                 const data = await response.json();
-
                 resultBox.innerHTML = JSON.stringify(data, null, 2);
 
             } catch (error) {
