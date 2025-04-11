@@ -236,6 +236,16 @@
     <script>
         let apiResponse = null; // Variable to store the API response
 
+        function generateMerchantReferenceId() {
+            const length = 10; // Default length (can be adjusted between 7 and 40)
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
         async function verifyVPA() {
             const vpa = document.getElementById("vpa").value;
             const merchantReferenceId = document.getElementById("merchantReferenceId").value;
