@@ -120,9 +120,8 @@
                 <input
                     id="merchantReferenceId"
                     type="text"
-                    placeholder="Merchant Reference ID (Auto-generated)"
+                    placeholder="Enter Merchant Reference ID"
                     class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
-                    readonly
                 />
 
                 <button
@@ -290,7 +289,7 @@
         async function verifyBankAccount() {
             const bankAccountNumber = document.getElementById("bankAccountNumber").value;
             const bankIfsc = document.getElementById("bankIfsc").value;
-            const merchantReferenceId = document.getElementById("merchantReferenceId").value;
+            const merchantReferenceId = document.getElementById("merchantReferenceId").value; // Capture the manually entered value
             const bankResultSection = document.getElementById("bankResult");
             const bankAccountElement = document.getElementById("bankAccount");
             const bankNameElement = document.getElementById("bankName");
@@ -310,7 +309,7 @@
                     body: JSON.stringify({
                         bank_account_number: bankAccountNumber,
                         bank_ifsc_code: bankIfsc,
-                        merchant_reference_id: merchantReferenceId
+                        merchant_reference_id: merchantReferenceId // Send the manually entered value
                     })
                 });
 
