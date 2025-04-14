@@ -161,6 +161,12 @@
                 <!-- Response Box for Bank Account Verification -->
                 <div id="bankResponseBox" class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4 hidden">
                     <pre id="bankResponseContent" class="text-sm text-gray-800 dark:text-gray-200"></pre>
+                    <button
+                        onclick="copyBankResponse()"
+                        class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition"
+                    >
+                        Copy Response
+                    </button>
                 </div>
             </div>
         </div>
@@ -181,7 +187,7 @@
                 />
 
                 <input
-                    id="merchantReferenceId"
+                    id="vpaMerchantReferenceId"
                     type="text"
                     placeholder="Enter Merchant Reference ID"
                     class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
@@ -216,24 +222,31 @@
                     </div>
                 </div>
 
-                <!-- View Response Button -->
+                <!-- View Response Button for VPA Validation -->
                 <button
-                    onclick="viewResponse()"
+                    onclick="viewVPAResponse()"
                     class="w-full bg-[#FF6501] text-white p-3 rounded-lg shadow-md hover:bg-[#e55b01] transition"
                 >
                     View Response
                 </button>
 
-                <!-- Response Box -->
-                <div id="responseBox" class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4 hidden">
-                    <pre id="responseContent" class="text-sm text-gray-800 dark:text-gray-200"></pre>
+                <!-- Response Box for VPA Validation -->
+                <div id="vpaResponseBox" class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4 hidden">
+                    <pre id="vpaResponseContent" class="text-sm text-gray-800 dark:text-gray-200"></pre>
+                    <button
+                        onclick="copyVPAResponse()"
+                        class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition"
+                    >
+                        Copy Response
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let apiResponse = null; // Variable to store the API response
+        let vpaApiResponse = null; // Variable to store the VPA API response
+        let bankApiResponse = null; // Variable to store the Bank Account API response
 
         function generateMerchantReferenceId() {
             const length = 10; // Default length (can be adjusted between 7 and 40)
@@ -247,7 +260,7 @@
 
         async function verifyVPA() {
             const vpa = document.getElementById("vpa").value;
-            const merchantReferenceId = document.getElementById("merchantReferenceId").value;
+            const merchantReferenceId = document.getElementById("vpaMerchantReferenceId").value;
             const resultSection = document.getElementById("result");
             const nameElement = document.getElementById("name");
             const bankIfscCodeElement = document.getElementById("bankIfscCode");
@@ -271,7 +284,7 @@
                 });
 
                 const data = await response.json();
-                apiResponse = data;
+                vpaApiResponse = data; // Store the VPA API response
 
                 nameElement.textContent = data.name_as_per_bank || "N/A";
                 bankIfscCodeElement.textContent = data.bank_ifsc_code || "N/A";
@@ -289,7 +302,7 @@
         async function verifyBankAccount() {
             const bankAccountNumber = document.getElementById("bankAccountNumber").value;
             const bankIfsc = document.getElementById("bankIfsc").value;
-            const merchantReferenceId = document.getElementById("merchantReferenceId").value; // Capture the manually entered value
+            const merchantReferenceId = document.getElementById("merchantReferenceId").value;
             const bankResultSection = document.getElementById("bankResult");
             const bankAccountElement = document.getElementById("bankAccount");
             const bankNameElement = document.getElementById("bankName");
@@ -297,7 +310,6 @@
             const bankStatusElement = document.getElementById("bankStatus");
             const bankIfscResultElement = document.getElementById("bankIfscResult");
 
-            // Hide the result section initially
             bankResultSection.classList.add("hidden");
 
             try {
@@ -309,35 +321,22 @@
                     body: JSON.stringify({
                         bank_account_number: bankAccountNumber,
                         bank_ifsc_code: bankIfsc,
-                        merchant_reference_id: merchantReferenceId // Send the manually entered value
+                        merchant_reference_id: merchantReferenceId
                     })
                 });
 
                 const data = await response.json();
+                bankApiResponse = data; // Store the Bank Account API response
 
-                // Populate the result section with the required data
                 bankAccountElement.textContent = data.bank_account_number || "N/A";
                 bankNameElement.textContent = data.name_as_per_bank || "N/A";
                 bankMessageElement.textContent = data.message || "N/A";
                 bankStatusElement.textContent = data.status || "N/A";
                 bankIfscResultElement.textContent = data.bank_ifsc_code || "N/A";
 
-                // Show the result section
                 bankResultSection.classList.remove("hidden");
             } catch (error) {
                 alert("Error: " + error.message);
-            }
-        }
-
-        function viewResponse() {
-            const responseBox = document.getElementById("responseBox");
-            const responseContent = document.getElementById("responseContent");
-
-            if (apiResponse) {
-                responseContent.textContent = JSON.stringify(apiResponse, null, 2); // Format the API response
-                responseBox.classList.remove("hidden"); // Show the response box
-            } else {
-                alert("No response available. Please verify VPA first.");
             }
         }
 
@@ -345,17 +344,52 @@
             const bankResponseBox = document.getElementById("bankResponseBox");
             const bankResponseContent = document.getElementById("bankResponseContent");
 
-            if (apiResponse) {
-                bankResponseContent.textContent = JSON.stringify(apiResponse, null, 2); // Format the API response
+            if (bankApiResponse) {
+                bankResponseContent.textContent = JSON.stringify(bankApiResponse, null, 2); // Format the Bank Account API response
                 bankResponseBox.classList.remove("hidden"); // Show the response box
             } else {
                 alert("No response available. Please verify Bank Account first.");
             }
         }
 
+        function viewVPAResponse() {
+            const vpaResponseBox = document.getElementById("vpaResponseBox");
+            const vpaResponseContent = document.getElementById("vpaResponseContent");
+
+            if (vpaApiResponse) {
+                vpaResponseContent.textContent = JSON.stringify(vpaApiResponse, null, 2); // Format the VPA API response
+                vpaResponseBox.classList.remove("hidden"); // Show the response box
+            } else {
+                alert("No response available. Please verify VPA first.");
+            }
+        }
+
+        function copyBankResponse() {
+            const bankResponseContent = document.getElementById("bankResponseContent").textContent;
+            navigator.clipboard.writeText(bankResponseContent).then(() => {
+                alert("Bank Account Verification response copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy response: " + err);
+            });
+        }
+
+        function copyVPAResponse() {
+            const vpaResponseContent = document.getElementById("vpaResponseContent").textContent;
+            navigator.clipboard.writeText(vpaResponseContent).then(() => {
+                alert("VPA Validation response copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy response: " + err);
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
-            const merchantReferenceIdField = document.getElementById("merchantReferenceId");
-            merchantReferenceIdField.value = generateMerchantReferenceId();
+            // Auto-generate merchant reference ID for Bank Account Verification
+            const bankMerchantReferenceIdField = document.getElementById("merchantReferenceId");
+            bankMerchantReferenceIdField.value = generateMerchantReferenceId();
+
+            // Auto-generate merchant reference ID for VPA Validation
+            const vpaMerchantReferenceIdField = document.getElementById("vpaMerchantReferenceId");
+            vpaMerchantReferenceIdField.value = generateMerchantReferenceId();
         });
     </script>
 
